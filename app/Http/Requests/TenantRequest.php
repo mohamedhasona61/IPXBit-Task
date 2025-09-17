@@ -13,6 +13,8 @@ class TenantRequest extends BaseFormRequest
     {
         return [
             'name' => 'required|string|unique:tenants,name',
+
+
             'db_name' => [
                 'required',
                 'string',

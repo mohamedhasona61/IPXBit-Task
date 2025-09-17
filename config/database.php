@@ -113,8 +113,6 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
-
-
         'tenant' => [
             'driver' => 'mysql',
             'host' => env('DB_HOST', '127.0.0.1'),

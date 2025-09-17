@@ -34,16 +34,16 @@ class TenantService
                 'engine' => null,
             ]);
             DB::reconnect('tenant');
-            // Artisan::call('migrate', [
-            //     '--path' => '/database/migrations/tenant',
-            //     '--database' => 'tenant',
-            //     '--force' => true,
-            // ]);
-            // Artisan::call('db:seed', [
-            //     '--class' => 'TenantAdminSeeder',
-            //     '--database' => 'tenant',
-            //     '--force' => true,
-            // ]);
+            Artisan::call('migrate', [
+                '--path' => '/database/migrations/tenant',
+                '--database' => 'tenant',
+                '--force' => true,
+            ]);
+            Artisan::call('db:seed', [
+                '--class' => 'TenantAdminSeeder',
+                '--database' => 'tenant',
+                '--force' => true,
+            ]);
             return $tenant;
         } catch (Exception $e) {
             DB::connection('mysql')->rollBack();
@@ -53,5 +53,18 @@ class TenantService
             }
             throw new Exception("Tenant creation failed: " . $e->getMessage(), 0, $e);
         }
+    }
+
+    public function listTenants()
+    {
+        return Tenant::all();
+    }
+    public function suspendTenant(int $id, string $status = 'suspended'): Tenant
+    {
+        $tenant = Tenant::findOrFail($id);
+        $tenant->status = $status;
+        $tenant->save();
+
+        return $tenant;
     }
 }

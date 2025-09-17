@@ -15,7 +15,6 @@ class Tenant extends Model
         'db_pass',
         'status',
     ];
-
     protected static function booted()
     {
         static::creating(function (Tenant $tenant) {

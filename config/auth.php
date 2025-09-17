@@ -40,9 +40,9 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        'tenant-jwt' => [
+        'jwt-tenant' => [
             'driver' => 'jwt-tenant',
-            'provider' => 'users',
+            'provider' => null,
         ],
     ],
 

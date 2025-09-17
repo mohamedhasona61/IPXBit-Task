@@ -2,33 +2,48 @@
 
 namespace App\Services;
 
-
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Exception;
+use App\Models\RefreshToken;
 
 
 class JWTService
 {
-    public static function sign(array $claims, ?int $ttl = null): string
+    private string $key;
+
+    public function __construct()
     {
-        $secret = base64_decode(env('JWT_SECRET')) ?: env('JWT_SECRET');
-        $now = time();
-        $exp = $now + ($ttl ?? (int) (env('JWT_TTL', 3600)));
-        $payload = array_merge([
-            'iat' => $now,
-            'nbf' => $now,
-            'exp' => $exp,
-        ], $claims);
-        return JWT::encode($payload, $secret, 'HS256');
+        $this->key = config('app.jwt_secret', env('APP_KEY'));
     }
-    public static function decode(string $token): object
+    public function encode(array $payload, int $ttl = 3600): string
     {
-        $secret = base64_decode(env('JWT_SECRET')) ?: env('JWT_SECRET');
-        try {
-            return JWT::decode($token, new Key($secret, 'HS256'));
-        } catch (Exception $e) {
-            throw $e;
-        }
+        $payload['iat'] = time();
+        $payload['exp'] = time() + $ttl;
+        return JWT::encode($payload, $this->key, 'HS256');
+    }
+    public function decode(string $token): object
+    {
+        return JWT::decode($token, new Key($this->key, 'HS256'));
+    }
+    public function generateTokens(array $payload): array
+    {
+        $accessToken = $this->encode($payload, 3600);
+        $refreshToken = $this->encode([
+            'sub'       => $payload['sub'],
+            'tenant_id' => $payload['tenant_id'],
+            'type'      => 'refresh'
+        ], 604800);
+        RefreshToken::create([
+            'tenant_id'  => $payload['tenant_id'],
+            'user_id'    => $payload['sub'],
+            'token'      => $refreshToken,
+            'expires_at' => now()->addDays(7),
+        ]);
+        return [
+            'access_token'  => $accessToken,
+            'refresh_token' => $refreshToken,
+            'token_type'    => 'Bearer',
+            'expires_in'    => 3600
+        ];
     }
 }

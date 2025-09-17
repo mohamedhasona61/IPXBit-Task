@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\Facades\Auth;
 use App\Auth\Guards\JwtTenantGuard;
 
+use App\Services\JwtService;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -24,7 +25,7 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Auth::extend('jwt-tenant', function ($app, $name, array $config) {
-            return new JwtTenantGuard($app['request']);
+            return new JwtTenantGuard(new JwtService());
         });
     }
 }

@@ -17,9 +17,7 @@ class TenantController extends Controller
     }
     public function store(TenantRequest $request)
     {
-
         $data = $request->validated();
-
         $tenant = $this->tenantService->createTenant($data);
         return $this->successResponse(200, "Tenant Created Successfully");
     }

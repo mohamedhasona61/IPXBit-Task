@@ -1,0 +1,216 @@
+{
+	"info": {
+		"_postman_id": "00599a14-2a2d-4bcb-8314-8cfd81bff1a4",
+		"name": "IPXBit-Task",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17915143"
+	},
+	"item": [
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "tenants",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{app_url}}/admin/tenants",
+							"host": [
+								"{{app_url}}"
+							],
+							"path": [
+								"admin",
+								"tenants"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tenant",
+			"item": [
+				{
+					"name": "get-Contacts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsInRlbmFudF9pZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU4MDQwNjEyLCJleHAiOjE3NTgwNDQyMTJ9.eEq45AbEuUf_4eje1VDwlMbVHDuuKiVPo7SM9kZr6I4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{app_url}}/tenant/contacts",
+							"host": [
+								"{{app_url}}"
+							],
+							"path": [
+								"tenant",
+								"contacts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Daily Report",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsInRlbmFudF9pZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU4MDQwNjEyLCJleHAiOjE3NTgwNDQyMTJ9.eEq45AbEuUf_4eje1VDwlMbVHDuuKiVPo7SM9kZr6I4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{app_url}}/tenant/reports/deals",
+							"host": [
+								"{{app_url}}"
+							],
+							"path": [
+								"tenant",
+								"reports",
+								"deals"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Create Tenant",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\" : \"IPXBiT\",\r\n    \"db_name\" : \"db_ipxbit2\",\r\n    \"db_user\" : \"ipxbit_user\",\r\n    \"db_pass\" : \"StrongPass123!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/tenants",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"tenants"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tenant Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tenant\" : \"ipxbit\",\r\n    \"email\" : \"admin@tenant.com\",\r\n    \"password\" : \"password\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/tenant/login",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"tenant",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Refresh Token",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsInRlbmFudF9pZCI6MSwidHlwZSI6InJlZnJlc2giLCJpYXQiOjE3NTgwODc0NzcsImV4cCI6MTc1ODY5MjI3N30.FBfWu4foA0Rw7Yiw5QUmifMJqchyVlCeSjCq8M7HYZ8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/tenant/refresh-token",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"tenant",
+						"refresh-token"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "app_url",
+			"value": ""
+		}
+	]
+}
