@@ -1,61 +1,122 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Multi-Tenant SaaS CRM with Custom JWT Guard
+This is a Laravel-based multi-tenant SaaS CRM platform. The application uses a multi-database architecture where each tenant has their own dedicated database to ensure strict data isolation. Authentication is handled by a custom JWT guard, which identifies tenants via claims in the JWT rather than subdomains.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+1. Features
 
-## About Laravel
+Multi-Tenancy: Each tenant (company) operates on a separate database. A central database manages tenant information and global admins.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Custom JWT Guard: A custom jwt-tenant guard dynamically switches the database connection based on the tenant_id claim in the JWT, authenticating the user from the correct tenant database.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Strict Isolation: User and data are strictly isolated per tenant.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+API Endpoints: The project includes separate API endpoints for global admins (on the system DB) and for individual tenants (on their respective databases).
 
-## Learning Laravel
+Middleware: A middleware ensures that every tenant request has a valid JWT, belongs to an active tenant, and uses the correct tenant database connection.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+2. Getting Started
+   Prerequisites
+   PHP (version compatible with Laravel)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Composer
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+MySQL or a compatible database server
 
-## Laravel Sponsors
+Installation
+Clone the repository:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Bash
 
-### Premium Partners
+git clone your-repository-url.git
+cd your-project-folder
+Install Composer dependencies:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Bash
 
-## Contributing
+composer install
+Create your .env file from the example and generate an application key:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Bash
 
-## Code of Conduct
+cp .env.example .env
+php artisan key:generate 3. Database Setup
+Open your .env file and configure the connection for the central system database. This database will manage all tenants.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Ini, TOML
 
-## Security Vulnerabilities
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=your_system_db
+DB_USERNAME=root
+DB_PASSWORD=
+Create the your_system_db database in your database management system.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+4. How to Run the Project
+   Run Migrations: Execute the migrations for the central system database. This creates the tenants table.
 
-## License
+Bash
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+php artisan migrate
+
+Seed Tenants: Run the seeder to provision and set up two default tenants, acme and globex. This process will automatically create a new database for each tenant, run their specific migrations, and seed them with sample users and data.
+
+Bash
+
+php artisan db:seed --class=TenantSeeder 5. How to Use JWT Tokens
+How to Generate a Token
+To obtain a JWT for a tenant user, send a POST request to the /tenant/login endpoint with the user's credentials. The response will contain the JWT.
+
+Example POST request to /tenant/login:
+
+JSON
+
+{
+"email": "user@example.com",
+"password": "password"
+}
+The JWT will include claims like
+
+sub (user ID), tenant_id (tenant database ID), and role (user role).
+
+How to Use the Token
+Include the generated JWT in the Authorization header of all subsequent requests to tenant APIs.
+
+Authorization: Bearer [your_jwt_token_here] 6. API Endpoints
+A Postman collection is included in the deliverables for easy API testing.
+
+Admin APIs (using an admin JWT and system DB)
+
+POST /admin/tenants: Create a new tenant, including database provisioning.
+
+GET /admin/tenants: List all tenants with their status.
+
+PATCH /admin/tenants/{id}/suspend: Suspend a tenant, which will prevent their JWTs from working.
+
+Tenant APIs (using a tenant JWT and tenant DB)
+
+POST /tenant/login: Authenticate a tenant user and return a JWT.
+
+GET /contacts: List contacts for the authenticated tenant.
+
+POST /contacts: Create a new contact.
+
+POST /deals: Create a new deal.
+
+GET /reports/deals: Get a deals summary (e.g., total won revenue).
+
+7. Deliverables
+   A Laravel project on GitHub.
+
+This
+
+README.md file with clear setup and usage instructions.
+
+A seeder to provision and seed at least two tenants (
+
+acme and globex).
+
+A Postman collection (or Swagger docs) with example API requests.
+
+Unit tests demonstrating tenant isolation and JWT validation.
+
+Sources
